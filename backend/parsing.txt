@@ -1,0 +1,96 @@
+FHIR Data Parsing Library
+Overview
+
+This library provides classes to parse and extract information from FHIR (Fast Healthcare Interoperability Resources) JSON files. It handles dynamic parsing of various FHIR resource types including Patient, AllergyIntolerance, Encounter, Observation, and Procedure.
+Components
+FHIRParser
+
+A central class that manages the parsing of JSON files and orchestrates the extraction of information from various FHIR resources.
+Methods:
+
+    __init__(self, folder_path): Initializes the parser with the directory containing FHIR JSON files.
+    parse_json_files(self, filename): Parses a JSON file and dynamically collects resources.
+    parse_resources(self, resources): Extracts information from collected resources using specific parsers.
+
+PatientParser
+
+Handles the parsing and information extraction of Patient resources.
+Methods:
+
+    parse(patient_data): Parses patient data.
+    extract_full_name(human_name): Extracts the full name from a human name object.
+    convert_to_tz_naive(dt): Converts datetime to timezone naive.
+    extract_patient_info(patient, allergies, encounters): Extracts patient information along with allergies and encounters.
+    date_to_datetime(date): Converts date to datetime.
+    calculate_age(birth_date): Calculates the age from the birth date.
+
+AllergyParser
+
+Handles the parsing and information extraction of AllergyIntolerance resources.
+Methods:
+
+    parse(allergies_data): Parses allergy data.
+    trim_allergy_substance(substance_str): Trims unnecessary text from allergy substances.
+    str_reactions(allergy): Converts allergy reactions to a string.
+    extract_allergies_info(allergies): Extracts information about allergies.
+
+EncounterParser
+
+Handles the parsing and information extraction of Encounter resources.
+Methods:
+
+    parse(encounters_data): Parses encounter data.
+    extract_encounters_info(encounters): Extracts information about encounters.
+
+ObservationParser
+
+Handles the parsing and information extraction of Observation resources.
+Methods:
+
+    parse(observations_data): Parses observation data.
+    extract_observations_info(observations): Extracts information about observations.
+
+ProcedureParser
+
+Handles the parsing and information extraction of Procedure resources.
+Methods:
+
+    parse(procedures_data): Parses procedure data.
+    extract_procedures_info(procedures): Extracts information about procedures.
+
+ExcelExporter
+
+Handles the export of extracted information to Excel.
+Methods:
+
+    export_to_excel(self, data, filename): Exports data to an Excel file with multiple sheets.
+
+Example Usage
+
+```python```
+import os
+
+folder_path = './fhir'
+parser = FHIRParser(folder_path)
+
+patients_data = []
+total = len(os.listdir(folder_path))
+for index, filename in enumerate(os.listdir(folder_path)):
+    if filename.endswith('.json'):
+        print(f"{index} / {total}")
+        file_path = os.path.join(folder_path, filename)
+        resources = parser.parse_json_files(file_path)
+        patient_info = parser.parse_resources(resources)
+        if patient_info:
+            patients_data.append(patient_info)
+
+# Export to Excel
+ExcelExporter.export_to_excel(patients_data, "patient_info.xlsx")
+
+print("Excel file created successfully.")
+
+Notes
+
+    The FHIRParser class dynamically handles different resource types.
+    Each specific parser class (PatientParser, AllergyParser, etc.) focuses on parsing and extracting information from a single FHIR resource type.
+    The ExcelExporter class consolidates the extracted data and exports it to an Excel file with separate sheets for different resource types.
